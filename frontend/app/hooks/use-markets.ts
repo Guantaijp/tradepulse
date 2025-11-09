@@ -1,27 +1,28 @@
 "use client"
 
-
-import { useQuery, useMutation } from '@apollo/client/react';
+import { useQuery, useMutation } from "@apollo/client/react"
 import { apolloClient } from "@/app/lib/graphql-client"
-import { GET_MARKETS, GET_MARKET, PLACE_BET } from "@/app/lib/queries"
-
-// Import the types from the separate file
-import {
+import { 
+  GET_MARKETS, 
+  GET_MARKET, 
+  
+  PLACE_BET,
   GetMarketsData,
   GetMarketsVariables,
   GetMarketData,
   GetMarketVariables,
   PlaceBetData,
   PlaceBetVariables
-} from '@/app/types';
-
-
+} from "@/app/lib/queries"
 
 export function useMarkets(limit = 10) {
-  const { data, loading, error, refetch } = useQuery<GetMarketsData, GetMarketsVariables>(GET_MARKETS, {
-    variables: { limit, offset: 0 },
-    client: apolloClient,
-  })
+  const { data, loading, error, refetch } = useQuery<GetMarketsData, GetMarketsVariables>(
+    GET_MARKETS,
+    {
+      variables: { limit, offset: 0 },
+      client: apolloClient,
+    }
+  )
 
   return {
     markets: data?.markets || [],
@@ -31,13 +32,15 @@ export function useMarkets(limit = 10) {
   }
 }
 
-
 export function useMarket(id: string) {
-  const { data, loading, error } = useQuery<GetMarketData, GetMarketVariables>(GET_MARKET, {
-    variables: { id },
-    client: apolloClient,
-    skip: !id,
-  })
+  const { data, loading, error } = useQuery<GetMarketData, GetMarketVariables>(
+    GET_MARKET,
+    {
+      variables: { id },
+      client: apolloClient,
+      skip: !id,
+    }
+  )
 
   return {
     market: data?.market,
@@ -47,10 +50,13 @@ export function useMarket(id: string) {
 }
 
 export function usePlaceBet() {
-  const [placeBet, { loading, error }] = useMutation<PlaceBetData, PlaceBetVariables>(PLACE_BET, {
-    client: apolloClient,
-    refetchQueries: [{ query: GET_MARKETS }],
-  })
+  const [placeBet, { loading, error }] = useMutation<PlaceBetData, PlaceBetVariables>(
+    PLACE_BET,
+    {
+      client: apolloClient,
+      refetchQueries: [{ query: GET_MARKETS }],
+    }
+  )
 
   return {
     placeBet: async (marketId: string, userId: string, amount: number, prediction: boolean) => {

@@ -1,21 +1,20 @@
 "use client"
 
-import { useQuery, } from '@apollo/client/react';
+import { useQuery } from '@apollo/client/react';
 import { apolloClient } from "@/app/lib/graphql-client"
-import { GET_USER, GET_USER_BETS, GET_LEADERBOARD } from "@/app/lib/queries"
-
-
-import {
+import { 
+  GET_USER, 
+  GET_USER_BETS, 
+  GET_LEADERBOARD,
   GetUserData,
   GetUserVariables,
   GetUserBetsData,
   GetUserBetsVariables,
   GetLeaderboardData,
   GetLeaderboardVariables
-} from '@/app/types';
+} from "@/app/lib/queries" // Import types from the same file
 
 export function useUser(userId: string) {
-  // Pass the types to the useQuery hook
   const { data, loading, error } = useQuery<GetUserData, GetUserVariables>(GET_USER, {
     variables: { id: userId },
     client: apolloClient,
@@ -29,9 +28,7 @@ export function useUser(userId: string) {
   }
 }
 
-
 export function useUserBets(userId: string, limit = 10) {
-  // Pass the types to the useQuery hook
   const { data, loading, error } = useQuery<GetUserBetsData, GetUserBetsVariables>(GET_USER_BETS, {
     variables: { userId, limit },
     client: apolloClient,
@@ -45,9 +42,7 @@ export function useUserBets(userId: string, limit = 10) {
   }
 }
 
-
 export function useLeaderboard(limit = 10) {
-  // Pass the types to the useQuery hook
   const { data, loading, error, refetch } = useQuery<GetLeaderboardData, GetLeaderboardVariables>(GET_LEADERBOARD, {
     variables: { limit },
     client: apolloClient,

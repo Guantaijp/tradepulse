@@ -1,7 +1,11 @@
 import { gql } from "@apollo/client"
 
+// Enum types matching your GraphQL schema
+export type MarketStatus = "OPEN" | "CLOSED" | "RESOLVED"
+export type BetStatus = "PENDING" | "WON" | "LOST" | "VOIDED"
+
 // Define the structure of a single Market object
-interface Market {
+export interface Market {
     id: string;
     title: string;
     description: string;
@@ -9,24 +13,155 @@ interface Market {
     yesOdds: number;
     noOdds: number;
     totalVolume: number;
-    status: string;
-    resolutionDate?: string; // Optional if it can be null
+    status: MarketStatus;
+    resolutionDate?: string;
+    outcome?: boolean;
 }
 
-// Define the full shape of the data returned by the GET_MARKETS query
-interface GetMarketsData {
+// Define the structure of a Bet object
+export interface Bet {
+    id: string;
+    marketId?: string;
+    userId?: string;
+    amount: number;
+    prediction: boolean;
+    odds: number;
+    potentialPayout: number;
+    status: BetStatus;
+    createdAt?: string;
+}
+
+// Define the structure of a User object
+export interface User {
+    id: string;
+    username: string;
+    email: string;
+    balance: number;
+    totalBets: number;
+    winRate: number;
+    totalPnL: number;
+}
+
+// Define the structure of a LeaderboardEntry object
+export interface LeaderboardEntry {
+    rank: number;
+    userId: string;
+    username: string;
+    pnl: number;
+    winRate: number;
+    totalBets: number;
+}
+
+// Define the structure of MarketOdds object
+export interface MarketOdds {
+    id: string;
+    yesOdds: number;
+    noOdds: number;
+    confidence: number;
+    timestamp: string;
+}
+
+// Define the full shape of the data returned by queries
+export interface GetMarketsData {
     markets: Market[];
 }
 
-// Define the variables type if you want strict typing for input variables
-interface GetMarketsVariables {
-    limit?: number;
-    offset?: number;
-    status?: string;
+export interface GetMarketData {
+    market: Market & {
+        bets: Bet[];
+    };
 }
 
+export interface GetUserData {
+    user: User;
+}
+
+export interface GetUserBetsData {
+    userBets: Bet[];
+}
+
+export interface GetLeaderboardData {
+    leaderboard: LeaderboardEntry[];
+}
+
+export interface GetMarketOddsData {
+    marketOdds: MarketOdds;
+}
+
+// Define the variables types for strict typing
+export interface GetMarketsVariables {
+    limit?: number;
+    offset?: number;
+    status?: MarketStatus;
+}
+
+export interface GetMarketVariables {
+    id: string;
+}
+
+export interface GetUserVariables {
+    id: string;
+}
+
+export interface GetUserBetsVariables {
+    userId: string;
+    limit?: number;
+}
+
+export interface GetLeaderboardVariables {
+    limit?: number;
+}
+
+export interface GetMarketOddsVariables {
+    marketId: string;
+}
+
+export interface PlaceBetInput {
+    marketId: string;
+    userId: string;
+    amount: number;
+    prediction: boolean;
+}
+
+export interface PlaceBetVariables {
+    input: PlaceBetInput;
+}
+
+export interface PlaceBetData {
+    placeBet: {
+        success: boolean;
+        bet?: Bet;
+        message: string;
+    };
+}
+
+export interface CreateMarketInput {
+    title: string;
+    description: string;
+    category: string;
+    resolutionDate: string;
+}
+
+export interface CreateMarketVariables {
+    input: CreateMarketInput;
+}
+
+export interface CreateMarketData {
+    createMarket: Market;
+}
+
+export interface ResolveMarketVariables {
+    marketId: string;
+    outcome: boolean;
+}
+
+export interface ResolveMarketData {
+    resolveMarket: Market;
+}
+
+// QUERIES
 export const GET_MARKETS = gql`
-  query GetMarkets($status: String, $limit: Int, $offset: Int) {
+  query GetMarkets($status: MarketStatus, $limit: Int, $offset: Int) {
     markets(status: $status, limit: $limit, offset: $offset) {
       id
       title
@@ -118,6 +253,7 @@ export const GET_MARKET_ODDS = gql`
   }
 `
 
+// MUTATIONS
 export const PLACE_BET = gql`
   mutation PlaceBet($input: PlaceBetInput!) {
     placeBet(input: $input) {

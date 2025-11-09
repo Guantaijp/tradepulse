@@ -1,0 +1,107 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String     @id @default(cuid())
+  email     String     @unique
+  username  String     @unique
+  balance   Float      @default(1000)
+  totalBets Int        @default(0)
+  winRate   Float      @default(0)
+  totalPnL  Float      @default(0)
+  walletAddress String?
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  
+  bets   Bet[]
+  trades Trade[]
+  
+  @@map("users")
+}
+
+model Market {
+  id              String   @id @default(cuid())
+  title           String
+  description     String
+  category        String
+  yesOdds         Float    @default(1.8)
+  noOdds          Float    @default(2.0)
+  totalVolume     Float    @default(0)
+  totalLiquidity  Float    @default(0)
+  yesBets         Float    @default(0)
+  noBets          Float    @default(0)
+  resolutionDate  DateTime
+  outcome         Boolean?
+  status          MarketStatus @default(OPEN)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  bets   Bet[]
+  odds   MarketOdds[]
+  
+  @@map("markets")
+}
+
+enum MarketStatus {
+  OPEN
+  CLOSED
+  RESOLVED
+}
+
+model Bet {
+  id              String   @id @default(cuid())
+  marketId        String
+  market          Market   @relation(fields: [marketId], references: [id], onDelete: Cascade)
+  userId          String
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  amount          Float
+  prediction      Boolean
+  odds            Float
+  potentialPayout Float
+  actualPayout    Float?
+  status          BetStatus @default(PENDING)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  @@map("bets")
+  @@index([marketId])
+  @@index([userId])
+}
+
+enum BetStatus {
+  PENDING
+  WON
+  LOST
+  VOIDED
+}
+
+model MarketOdds {
+  id          String   @id @default(cuid())
+  marketId    String
+  market      Market   @relation(fields: [marketId], references: [id], onDelete: Cascade)
+  yesOdds     Float
+  noOdds      Float
+  confidence  Float
+  createdAt   DateTime @default(now())
+  
+  @@map("market_odds")
+  @@index([marketId])
+}
+
+model Trade {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  action    String
+  amount    Float
+  timestamp DateTime @default(now())
+  
+  @@map("trades")
+  @@index([userId])
+}

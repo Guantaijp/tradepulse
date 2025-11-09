@@ -1,0 +1,7 @@
+{
+  "name": "tradepulse-backend",
+  "version": "1.0.0",
+  "description": "TradePulse Backend Services",
+  "private": true,
+  "workspaces": ["services/graphql-api", "services/database"]
+}

@@ -12,14 +12,6 @@ export interface Market {
     bets?: Bet[];
 }
 
-export interface Bet {
-    id: string;
-    amount: number;
-    odds: number;
-    prediction: boolean;
-    status: string;
-}
-
 // Query/Mutation Specific Interfaces
 export interface GetMarketsData {
     markets: Market[];

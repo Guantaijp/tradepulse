@@ -1,0 +1,113 @@
+type Query {
+  market(id: ID!): Market
+  markets(status: MarketStatus, limit: Int, offset: Int): [Market!]!
+  user(id: ID!): User
+  userBets(userId: ID!, limit: Int): [Bet!]!
+  leaderboard(limit: Int): [LeaderboardEntry!]!
+  marketOdds(marketId: ID!): MarketOdds
+}
+
+type Mutation {
+  placeBet(input: PlaceBetInput!): BetResult!
+  createMarket(input: CreateMarketInput!): Market!
+  resolveMarket(marketId: ID!, outcome: Boolean!): Market!
+  updateUserProfile(input: UpdateUserInput!): User!
+}
+
+type Subscription {
+  marketOddsUpdated(marketId: ID!): MarketOdds!
+  betPlaced(marketId: ID!): Bet!
+  marketResolved(marketId: ID!): Market!
+}
+
+type Market {
+  id: ID!
+  title: String!
+  description: String!
+  category: String!
+  yesOdds: Float!
+  noOdds: Float!
+  totalVolume: Float!
+  resolutionDate: String!
+  status: MarketStatus!
+  createdAt: String!
+  updatedAt: String!
+}
+
+enum MarketStatus {
+  OPEN
+  CLOSED
+  RESOLVED
+}
+
+type MarketOdds {
+  marketId: ID!
+  yesOdds: Float!
+  noOdds: Float!
+  confidence: Float!
+  timestamp: String!
+}
+
+type Bet {
+  id: ID!
+  marketId: ID!
+  userId: ID!
+  amount: Float!
+  prediction: Boolean!
+  odds: Float!
+  potentialPayout: Float!
+  status: BetStatus!
+  createdAt: String!
+}
+
+enum BetStatus {
+  PENDING
+  WON
+  LOST
+  VOIDED
+}
+
+type User {
+  id: ID!
+  username: String!
+  balance: Float!
+  totalBets: Int!
+  winRate: Float!
+  totalPnL: Float!
+  createdAt: String!
+}
+
+type LeaderboardEntry {
+  rank: Int!
+  userId: ID!
+  username: String!
+  pnl: Float!
+  winRate: Float!
+  totalBets: Int!
+}
+
+type BetResult {
+  success: Boolean!
+  bet: Bet
+  message: String!
+}
+
+input PlaceBetInput {
+  marketId: ID!
+  userId: ID!
+  amount: Float!
+  prediction: Boolean!
+}
+
+input CreateMarketInput {
+  title: String!
+  description: String!
+  category: String!
+  resolutionDate: String!
+}
+
+input UpdateUserInput {
+  userId: ID!
+  username: String
+  email: String
+}
