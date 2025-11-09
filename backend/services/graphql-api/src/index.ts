@@ -403,7 +403,7 @@ async function startServer() {
   app.use(
     "/graphql",
     cors<cors.CorsRequest>({
-      origin: ["http://localhost:3000", "http://localhost:3001"], // Add your frontend URLs
+      origin: ["http://localhost:3000", "https://tradepulse-gules.vercel.app"], 
       credentials: true,
     }),
     express.json(),
