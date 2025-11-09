@@ -2,7 +2,7 @@ import { ApolloClient, InMemoryCache, HttpLink, ApolloLink } from "@apollo/clien
 import { onError } from "@apollo/client/link/error"
 
 const httpLink = new HttpLink({
-  uri: process.env.NEXT_PUBLIC_GRAPHQL_API || "http://localhost:4000/graphql",
+  uri: "https://tradepulse-ttrp-git-main-guantai001s-projects.vercel.app/graphql",
   credentials: "include",
 })
 
